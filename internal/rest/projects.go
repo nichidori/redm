@@ -34,9 +34,5 @@ func (c *Client) GetProjects(ctx context.Context, offset, limit int) (*ProjectsR
 	if limit > 0 {
 		query.Set("limit", strconv.Itoa(limit))
 	}
-	resp := &ProjectsResponse{}
-	if err := c.doGet(ctx, "/projects.json", query, resp); err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return doGet[ProjectsResponse](c, ctx, "/projects.json", query)
 }

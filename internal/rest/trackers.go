@@ -15,9 +15,5 @@ type TrackersResponse struct {
 }
 
 func (c *Client) GetTrackers(ctx context.Context) (*TrackersResponse, error) {
-	resp := &TrackersResponse{}
-	if err := c.doGet(ctx, "/trackers.json", nil, resp); err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return doGet[TrackersResponse](c, ctx, "/trackers.json", nil)
 }

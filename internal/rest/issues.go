@@ -75,9 +75,5 @@ func (f IssueFilter) toQuery() url.Values {
 }
 
 func (c *Client) GetIssues(ctx context.Context, filter IssueFilter) (*IssuesResponse, error) {
-	resp := &IssuesResponse{}
-	if err := c.doGet(ctx, "/issues.json", filter.toQuery(), resp); err != nil {
-		return nil, err
-	}
-	return resp, nil
+	return doGet[IssuesResponse](c, ctx, "/issues.json", filter.toQuery())
 }
