@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nichidori/redm/internal/rest"
+	"github.com/nichidori/redm/internal/redmineapi"
 )
 
 func main() {
-	c := rest.NewClient(
+	c := redmineapi.NewClient(
 		"http://localhost:3000",
 		"e7315305dc0f377b1f5d0a37ac353e47436a5b2a",
 	)

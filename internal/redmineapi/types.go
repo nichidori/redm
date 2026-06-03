@@ -1,4 +1,4 @@
-package rest
+package redmineapi
 
 type PaginationMeta struct {
 	TotalCount int `json:"total_count"`
