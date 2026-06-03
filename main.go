@@ -21,6 +21,7 @@ func main() {
 	}
 
 	cli.Register(CommandProject)
+	cli.Register(CommandIssue)
 
 	if err := cli.Execute(os.Args[1:]); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
