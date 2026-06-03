@@ -8,15 +8,20 @@ import (
 )
 
 type Project struct {
-	ID          int       `json:"id"`
-	Name        string    `json:"name"`
-	Identifier  string    `json:"identifier"`
-	Description string    `json:"description"`
-	Status      int       `json:"status"`
-	IsPublic    bool      `json:"is_public"`
-	Homepage    string    `json:"homepage,omitempty"`
-	CreatedOn   time.Time `json:"created_on"`
-	UpdatedOn   time.Time `json:"updated_on"`
+	ID                int           `json:"id"`
+	Name              string        `json:"name"`
+	Identifier        string        `json:"identifier"`
+	Description       string        `json:"description"`
+	Status            int           `json:"status"`
+	IsPublic          bool          `json:"is_public"`
+	InheritMembers    bool          `json:"inherit_members"`
+	Homepage          string        `json:"homepage,omitempty"`
+	Parent            *IDName       `json:"parent,omitempty"`
+	CustomFields      []CustomField `json:"custom_fields,omitempty"`
+	IssueCustomFields []IDName      `json:"issue_custom_fields,omitempty"`
+	IssueCategories   []IDName      `json:"issue_categories,omitempty"`
+	CreatedOn         time.Time     `json:"created_on"`
+	UpdatedOn         time.Time     `json:"updated_on"`
 }
 
 type ProjectsResponse struct {
@@ -28,6 +33,7 @@ type ProjectsResponse struct {
 // Use offset/limit for pagination (default: offset=0, limit=25, max=100).
 func (c *Client) GetProjects(ctx context.Context, offset, limit int) (*ProjectsResponse, error) {
 	query := url.Values{}
+	query.Set("include", "issue_custom_fields,issue_categories")
 	if offset > 0 {
 		query.Set("offset", strconv.Itoa(offset))
 	}
