@@ -24,37 +24,17 @@ var CommandIssue = Command{
 				return nil
 			}
 
-			fmt.Print(FixLength("ID", 4))
-			fmt.Print(" | ")
-			fmt.Print(FixLength("Project", 12))
-			fmt.Print(" | ")
-			fmt.Print(FixLength("Subject", 32))
-			fmt.Print(" | ")
-			fmt.Print(FixLength("Priority", 12))
-			fmt.Print(" | ")
-			fmt.Print(FixLength("Assignee", 16))
-			fmt.Print(" | ")
-			fmt.Print(FixLength("Status", 12))
-			fmt.Print(" | ")
-			fmt.Print(FixLength("Progress", 8))
-			fmt.Println()
-
-			for _, p := range resp.Issues {
-				fmt.Print(FixLength(strconv.Itoa(p.ID), 4))
-				fmt.Print(" | ")
-				fmt.Print(FixLength(p.Project.Name, 12))
-				fmt.Print(" | ")
-				fmt.Print(FixLength(p.Subject, 32))
-				fmt.Print(" | ")
-				fmt.Print(FixLength(p.Priority.Name, 12))
-				fmt.Print(" | ")
-				fmt.Print(FixLength(p.AssignedTo.Name, 16))
-				fmt.Print(" | ")
-				fmt.Print(FixLength(p.Status.Name, 12))
-				fmt.Print(" | ")
-				fmt.Print(FixLength(strconv.Itoa(p.DoneRatio)+"%", 8))
-				fmt.Println()
+			issues := resp.Issues
+			cols := []Column{
+				NewColumn("ID", 4, func(i int) string { return strconv.Itoa(issues[i].ID) }),
+				NewColumn("Project", 12, func(i int) string { return issues[i].Project.Name }),
+				NewColumn("Subject", 32, func(i int) string { return issues[i].Subject }),
+				NewColumn("Priority", 12, func(i int) string { return issues[i].Priority.Name }),
+				NewColumn("Assignee", 16, func(i int) string { return issues[i].AssignedTo.Name }),
+				NewColumn("Status", 12, func(i int) string { return issues[i].Status.Name }),
+				NewColumn("Progress", 8, func(i int) string { return strconv.Itoa(issues[i].DoneRatio) + "%" }),
 			}
+			PrintTable(cols, len(issues))
 
 			return nil
 		}

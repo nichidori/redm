@@ -17,25 +17,14 @@ var CommandProject = Command{
 				return fmt.Errorf("failed to fetch projects: %w", err)
 			}
 
-			fmt.Print(FixLength("ID", 4))
-			fmt.Print(" | ")
-			fmt.Print(FixLength("Name", 10))
-			fmt.Print(" | ")
-			fmt.Print(FixLength("Description", 30))
-			fmt.Print(" | ")
-			fmt.Print(FixLength("Last Update", 30))
-			fmt.Println()
-
-			for _, p := range resp.Projects {
-				fmt.Print(FixLength(strconv.Itoa(p.ID), 4))
-				fmt.Print(" | ")
-				fmt.Print(FixLength(p.Name, 10))
-				fmt.Print(" | ")
-				fmt.Print(FixLength(p.Description, 30))
-				fmt.Print(" | ")
-				fmt.Print(FixLength(p.UpdatedOn.String(), 30))
-				fmt.Println()
+			projects := resp.Projects
+			cols := []Column{
+				NewColumn("ID", 4, func(i int) string { return strconv.Itoa(projects[i].ID) }),
+				NewColumn("Name", 12, func(i int) string { return projects[i].Name }),
+				NewColumn("Description", 32, func(i int) string { return projects[i].Description }),
+				NewColumn("Last Update", 32, func(i int) string { return projects[i].UpdatedOn.String() }),
 			}
+			PrintTable(cols, len(projects))
 
 			return nil
 		}
