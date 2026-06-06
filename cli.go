@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/nichidori/redm/internal/config"
 	"github.com/nichidori/redm/internal/redmineapi"
 )
 
 type state struct {
 	client *redmineapi.Client
+	config *config.Config
 }
 
 type Command struct {

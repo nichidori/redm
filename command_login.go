@@ -17,7 +17,7 @@ var CommandLogin = Command{
 	Description: "Save Redmine credentials",
 	Setup: func(fs *flag.FlagSet, s *state) func() error {
 		return func() error {
-			if _, err := config.Load(); err == nil {
+			if s.config != nil {
 				return fmt.Errorf("you are already logged in")
 			}
 
@@ -44,10 +44,12 @@ var CommandLogin = Command{
 				return fmt.Errorf("API key must not be empty")
 			}
 
-			if err := config.Save(&config.Config{URL: url, APIKey: apiKey}); err != nil {
+			cfg := &config.Config{URL: url, APIKey: apiKey}
+			if err := config.Save(cfg); err != nil {
 				return fmt.Errorf("save config: %w", err)
 			}
 
+			s.config = cfg
 			fmt.Println("Login successful.")
 			return nil
 		}

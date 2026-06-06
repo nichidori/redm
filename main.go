@@ -10,7 +10,10 @@ import (
 
 func main() {
 	var baseURL, apiKey string
-	if cfg, err := config.Load(); err == nil {
+	var cfg *config.Config
+
+	if c, err := config.Load(); err == nil {
+		cfg = c
 		baseURL = cfg.URL
 		apiKey = cfg.APIKey
 	}
@@ -21,6 +24,7 @@ func main() {
 		Name: "redm",
 		State: &state{
 			client: c,
+			config: cfg,
 		},
 	}
 
