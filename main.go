@@ -32,6 +32,7 @@ func main() {
 	cli.Register(CommandIssue)
 	cli.Register(CommandLogin)
 	cli.Register(CommandLogout)
+	cli.Register(CommandUser)
 
 	if err := cli.Execute(os.Args[1:]); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
