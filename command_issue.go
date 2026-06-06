@@ -14,6 +14,10 @@ var CommandIssue = Command{
 	Description: "Lists all issues",
 	Setup: func(fs *flag.FlagSet, s *state) func() error {
 		return func() error {
+			if s.config == nil {
+				return fmt.Errorf("not logged in")
+			}
+
 			resp, err := s.client.GetIssues(context.Background(), redmineapi.IssueFilter{})
 			if err != nil {
 				return fmt.Errorf("failed to fetch issues: %w", err)

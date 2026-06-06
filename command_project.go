@@ -12,6 +12,10 @@ var CommandProject = Command{
 	Description: "Lists all projects",
 	Setup: func(fs *flag.FlagSet, s *state) func() error {
 		return func() error {
+			if s.config == nil {
+				return fmt.Errorf("not logged in")
+			}
+
 			resp, err := s.client.GetProjects(context.Background(), 0, 25)
 			if err != nil {
 				return fmt.Errorf("failed to fetch projects: %w", err)
