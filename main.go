@@ -4,14 +4,18 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/nichidori/redm/internal/config"
 	"github.com/nichidori/redm/internal/redmineapi"
 )
 
 func main() {
-	c := redmineapi.NewClient(
-		"http://localhost:3000",
-		"e7315305dc0f377b1f5d0a37ac353e47436a5b2a",
-	)
+	var baseURL, apiKey string
+	if cfg, err := config.Load(); err == nil {
+		baseURL = cfg.URL
+		apiKey = cfg.APIKey
+	}
+
+	c := redmineapi.NewClient(baseURL, apiKey)
 
 	cli := &CLI{
 		Name: "redm",
@@ -22,6 +26,8 @@ func main() {
 
 	cli.Register(CommandProject)
 	cli.Register(CommandIssue)
+	cli.Register(CommandLogin)
+	cli.Register(CommandLogout)
 
 	if err := cli.Execute(os.Args[1:]); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
