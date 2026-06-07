@@ -70,53 +70,6 @@ var CommandNew = Command{
 			subject = strings.TrimSpace(subject)
 			fmt.Println()
 
-			// Priority selection (optional)
-			priorityResp, err := s.client.GetIssuePriorities(context.Background())
-			if err != nil {
-				return fmt.Errorf("failed to fetch priorities: %w", err)
-			}
-
-			var priorityID int
-			fmt.Println("Select priority (optional, press Enter to skip):")
-			for i, pri := range priorityResp.IssuePriorities {
-				fmt.Printf("(%v) %s\n", i+1, pri.Name)
-			}
-			fmt.Print("Enter priority number: ")
-			input, err := reader.ReadString('\n')
-			if err != nil {
-				return err
-			}
-			input = strings.TrimSpace(input)
-			if input != "" {
-				idx, err := strconv.Atoi(input)
-				if err == nil && idx >= 1 && idx <= len(priorityResp.IssuePriorities) {
-					priorityID = priorityResp.IssuePriorities[idx-1].ID
-				}
-			}
-			fmt.Println()
-
-			// Assign to current user
-			user, err := s.client.GetCurrentUser(context.Background())
-			if err != nil {
-				return fmt.Errorf("failed to get current user: %w", err)
-			}
-
-			// Estimated hours (optional)
-			var estimatedHours *float64
-			fmt.Print("Estimated hours (Enter to skip): ")
-			input, err = reader.ReadString('\n')
-			if err != nil {
-				return err
-			}
-			input = strings.TrimSpace(input)
-			if input != "" {
-				hours, err := strconv.ParseFloat(input, 64)
-				if err == nil {
-					estimatedHours = &hours
-				}
-			}
-			fmt.Println()
-
 			// Input issue description
 			fmt.Print("Description: ")
 			description, err := reader.ReadString('\n')
@@ -126,14 +79,18 @@ var CommandNew = Command{
 			description = strings.TrimSpace(description)
 			fmt.Println()
 
+			// Fetch current user
+			user, err := s.client.GetCurrentUser(context.Background())
+			if err != nil {
+				return fmt.Errorf("failed to get current user: %w", err)
+			}
+
 			req := &redmineapi.CreateIssueRequest{
-				ProjectID:      p.ID,
-				TrackerID:      t.ID,
-				Subject:        subject,
-				Description:    description,
-				PriorityID:     priorityID,
-				AssignedToID:   user.ID,
-				EstimatedHours: estimatedHours,
+				ProjectID:    p.ID,
+				TrackerID:    t.ID,
+				Subject:      subject,
+				Description:  description,
+				AssignedToID: user.ID,
 			}
 
 			issue, err := s.client.CreateIssue(context.Background(), req)
