@@ -2,6 +2,7 @@ package redmineapi
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"strconv"
 	"time"
@@ -87,14 +88,46 @@ type CreateIssueRequest struct {
 	CustomFields   []CustomField `json:"custom_fields,omitempty"`
 }
 
+type UpdateIssueRequest struct {
+	ProjectID      int           `json:"project_id,omitempty"`
+	TrackerID      int           `json:"tracker_id,omitempty"`
+	StatusID       int           `json:"status_id,omitempty"`
+	Subject        string        `json:"subject,omitempty"`
+	Description    string        `json:"description,omitempty"`
+	PriorityID     int           `json:"priority_id,omitempty"`
+	AssignedToID   int           `json:"assigned_to_id,omitempty"`
+	EstimatedHours *float64      `json:"estimated_hours,omitempty"`
+	StartDate      string        `json:"start_date,omitempty"`
+	DueDate        string        `json:"due_date,omitempty"`
+	DoneRatio      int           `json:"done_ratio,omitempty"`
+	Notes          string        `json:"notes,omitempty"`
+	PrivateNotes   bool          `json:"private_notes,omitempty"`
+	CustomFields   []CustomField `json:"custom_fields,omitempty"`
+}
+
 type CreateIssueResponse struct {
 	Issue Issue `json:"issue"`
+}
+
+func (c *Client) UpdateIssue(ctx context.Context, issueID int, req *UpdateIssueRequest) error {
+	_, err := doPut[any](
+		c, ctx, fmt.Sprintf("/issues/%d.json", issueID), map[string]*UpdateIssueRequest{"issue": req},
+	)
+	return err
 }
 
 func (c *Client) CreateIssue(ctx context.Context, req *CreateIssueRequest) (*Issue, error) {
 	resp, err := doPost[CreateIssueResponse](
 		c, ctx, "/issues.json", map[string]*CreateIssueRequest{"issue": req},
 	)
+	if err != nil {
+		return nil, err
+	}
+	return &resp.Issue, nil
+}
+
+func (c *Client) GetIssue(ctx context.Context, issueID int) (*Issue, error) {
+	resp, err := doGet[CreateIssueResponse](c, ctx, fmt.Sprintf("/issues/%d.json", issueID), nil)
 	if err != nil {
 		return nil, err
 	}

@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/nichidori/redm/internal/config"
 	"github.com/nichidori/redm/internal/redmineapi"
@@ -75,4 +78,33 @@ func (c *CLI) PrintGlobalHelp() {
 		cmd := c.Commands[name]
 		fmt.Printf("  %s %s\n", FixLength(cmd.Name, 12), cmd.Description)
 	}
+}
+
+func SelectOption[T any](reader *bufio.Reader, label string, options []T, optionFormatter func(T) string) (T, error) {
+	fmt.Printf("Select %s:\n", label)
+	for i, o := range options {
+		fmt.Printf("(%v) %s\n", i+1, optionFormatter(o))
+	}
+
+	fmt.Printf("Enter %s number: ", label)
+
+	input, err := reader.ReadString('\n')
+	if err != nil {
+		var t T
+		return t, err
+	}
+
+	idx, err := strconv.Atoi(strings.TrimSpace(input))
+	if err != nil {
+		var t T
+		return t, err
+	}
+	idx--
+
+	if idx < 0 || idx >= len(options) {
+		var t T
+		return t, fmt.Errorf("invalid choice: must be between 1 and %d", len(options))
+	}
+
+	return options[idx], nil
 }

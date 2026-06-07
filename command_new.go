@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -31,7 +30,7 @@ var CommandNew = Command{
 			reader := bufio.NewReader(os.Stdin)
 
 			// Prompt user to select project
-			p, err := selectOption(
+			p, err := SelectOption(
 				reader,
 				"project",
 				projectResp.Projects,
@@ -50,7 +49,7 @@ var CommandNew = Command{
 			}
 
 			// Prompt user to select tracker
-			t, err := selectOption(
+			t, err := SelectOption(
 				reader,
 				"tracker",
 				trackersResp.Trackers,
@@ -127,33 +126,4 @@ var CommandNew = Command{
 			return nil
 		}
 	},
-}
-
-func selectOption[T any](reader *bufio.Reader, label string, options []T, optionFormatter func(T) string) (T, error) {
-	fmt.Printf("Select %s:\n", label)
-	for i, o := range options {
-		fmt.Printf("(%v) %s\n", i+1, optionFormatter(o))
-	}
-
-	fmt.Printf("Enter %s number: ", label)
-
-	input, err := reader.ReadString('\n')
-	if err != nil {
-		var t T
-		return t, err
-	}
-
-	idx, err := strconv.Atoi(strings.TrimSpace(input))
-	if err != nil {
-		var t T
-		return t, err
-	}
-	idx--
-
-	if idx < 0 || idx >= len(options) {
-		var t T
-		return t, fmt.Errorf("invalid choice: must be between 1 and %d", len(options))
-	}
-
-	return options[idx], nil
 }
