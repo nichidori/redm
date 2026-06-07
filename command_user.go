@@ -20,10 +20,7 @@ var CommandUser = Command{
 				return fmt.Errorf("failed to fetch current user: %w", err)
 			}
 
-			fmt.Printf("ID:        %d\n", user.ID)
-			fmt.Printf("Login:     %s\n", user.Login)
-			fmt.Printf("Name:      %s %s\n", user.FirstName, user.LastName)
-			fmt.Printf("Email:     %s\n", user.Mail)
+			fmt.Printf("%s (%s %s)\n", user.Login, user.FirstName, user.LastName)
 			return nil
 		}
 	},
