@@ -28,11 +28,12 @@ func main() {
 		},
 	}
 
-	cli.Register(CommandProject)
-	cli.Register(CommandIssue)
 	cli.Register(CommandLogin)
 	cli.Register(CommandLogout)
 	cli.Register(CommandUser)
+	cli.Register(CommandProject)
+	cli.Register(CommandIssue)
+	cli.Register(CommandNew)
 
 	if err := cli.Execute(os.Args[1:]); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)

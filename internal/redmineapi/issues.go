@@ -74,6 +74,31 @@ func (f IssueFilter) toQuery() url.Values {
 	return q
 }
 
+type CreateIssueRequest struct {
+	ProjectID      int           `json:"project_id"`
+	TrackerID      int           `json:"tracker_id"`
+	Subject        string        `json:"subject"`
+	Description    string        `json:"description,omitempty"`
+	PriorityID     int           `json:"priority_id,omitempty"`
+	AssignedToID   int           `json:"assigned_to_id,omitempty"`
+	EstimatedHours *float64      `json:"estimated_hours,omitempty"`
+	CustomFields   []CustomField `json:"custom_fields,omitempty"`
+}
+
+type CreateIssueResponse struct {
+	Issue Issue `json:"issue"`
+}
+
+func (c *Client) CreateIssue(ctx context.Context, req *CreateIssueRequest) (*Issue, error) {
+	resp, err := doPost[CreateIssueResponse](
+		c, ctx, "/issues.json", map[string]*CreateIssueRequest{"issue": req},
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &resp.Issue, nil
+}
+
 func (c *Client) GetIssues(ctx context.Context, filter IssueFilter) (*IssuesResponse, error) {
 	return doGet[IssuesResponse](c, ctx, "/issues.json", filter.toQuery())
 }
