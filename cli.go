@@ -34,7 +34,7 @@ func (c *CLI) Register(cmd Command) {
 }
 
 func (c *CLI) Execute(args []string) error {
-	if len(args) < 1 {
+	if len(args) < 1 || args[0] == "help" {
 		c.PrintGlobalHelp()
 		return nil
 	}
