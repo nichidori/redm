@@ -78,6 +78,7 @@ func (f IssueFilter) toQuery() url.Values {
 type CreateIssueRequest struct {
 	ProjectID      int           `json:"project_id"`
 	TrackerID      int           `json:"tracker_id"`
+	CategoryID     int           `json:"category_id,omitempty"`
 	Subject        string        `json:"subject"`
 	Description    string        `json:"description,omitempty"`
 	PriorityID     int           `json:"priority_id,omitempty"`
@@ -91,6 +92,7 @@ type CreateIssueRequest struct {
 type UpdateIssueRequest struct {
 	ProjectID      int           `json:"project_id,omitempty"`
 	TrackerID      int           `json:"tracker_id,omitempty"`
+	CategoryID     int           `json:"category_id,omitempty"`
 	StatusID       int           `json:"status_id,omitempty"`
 	Subject        string        `json:"subject,omitempty"`
 	Description    string        `json:"description,omitempty"`

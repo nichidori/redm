@@ -57,6 +57,49 @@ var CommandUpdate = Command{
 					r.ProjectID = p.ID
 					return nil
 				}},
+				{"Category", func(i redmineapi.Issue) string {
+					if i.Category != nil {
+						return i.Category.Name
+					}
+					return ""
+				}, func(r *redmineapi.UpdateIssueRequest, rd *bufio.Reader) error {
+					projects, err := s.client.GetProjects(context.Background(), 0, 100)
+					if err != nil {
+						return fmt.Errorf("failed to fetch projects: %w", err)
+					}
+					var proj *redmineapi.Project
+					for i := range projects.Projects {
+						if projects.Projects[i].ID == issue.Project.ID {
+							proj = &projects.Projects[i]
+							break
+						}
+					}
+					if proj == nil {
+						return fmt.Errorf("project not found in fetched list")
+					}
+					if len(proj.IssueCategories) == 0 {
+						fmt.Println("No categories available for this project")
+						return nil
+					}
+					cat, err := SelectOption(rd, "category", proj.IssueCategories, func(c redmineapi.IDName) string { return c.Name })
+					if err != nil {
+						return err
+					}
+					r.CategoryID = cat.ID
+					return nil
+				}},
+				{"Tracker", func(i redmineapi.Issue) string { return i.Tracker.Name }, func(r *redmineapi.UpdateIssueRequest, rd *bufio.Reader) error {
+					trackers, err := s.client.GetTrackers(context.Background())
+					if err != nil {
+						return fmt.Errorf("failed to fetch trackers: %w", err)
+					}
+					t, err := SelectOption(rd, "tracker", trackers.Trackers, func(t redmineapi.Tracker) string { return t.Name })
+					if err != nil {
+						return err
+					}
+					r.TrackerID = t.ID
+					return nil
+				}},
 				{"Subject", func(i redmineapi.Issue) string { return i.Subject }, func(r *redmineapi.UpdateIssueRequest, rd *bufio.Reader) error {
 					fmt.Print("New Subject: ")
 					v, err := rd.ReadString('\n')
@@ -91,18 +134,6 @@ var CommandUpdate = Command{
 						return err
 					}
 					r.DueDate = strings.TrimSpace(v)
-					return nil
-				}},
-				{"Tracker", func(i redmineapi.Issue) string { return i.Tracker.Name }, func(r *redmineapi.UpdateIssueRequest, rd *bufio.Reader) error {
-					trackers, err := s.client.GetTrackers(context.Background())
-					if err != nil {
-						return fmt.Errorf("failed to fetch trackers: %w", err)
-					}
-					t, err := SelectOption(rd, "tracker", trackers.Trackers, func(t redmineapi.Tracker) string { return t.Name })
-					if err != nil {
-						return err
-					}
-					r.TrackerID = t.ID
 					return nil
 				}},
 				{"Status", func(i redmineapi.Issue) string { return i.Status.Name }, func(r *redmineapi.UpdateIssueRequest, rd *bufio.Reader) error {

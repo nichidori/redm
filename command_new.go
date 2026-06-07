@@ -42,6 +42,23 @@ var CommandNew = Command{
 			fmt.Printf("Project '%s' has been selected\n", p.Name)
 			fmt.Println()
 
+			// Prompt user to select category
+			var catID int
+			if len(p.IssueCategories) > 0 {
+				cat, err := SelectOption(
+					reader,
+					"category",
+					p.IssueCategories,
+					func(c redmineapi.IDName) string { return c.Name },
+				)
+				if err != nil {
+					return err
+				}
+				fmt.Printf("Category '%s' has been selected\n", cat.Name)
+				fmt.Println()
+				catID = cat.ID
+			}
+
 			// Fetch tracker list
 			trackersResp, err := s.client.GetTrackers(context.Background())
 			if err != nil {
@@ -110,6 +127,7 @@ var CommandNew = Command{
 			req := &redmineapi.CreateIssueRequest{
 				ProjectID:    p.ID,
 				TrackerID:    t.ID,
+				CategoryID:   catID,
 				Subject:      subject,
 				Description:  description,
 				StartDate:    startDate,
