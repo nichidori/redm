@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/nichidori/redm/internal/redmineapi"
 )
@@ -61,7 +62,7 @@ var CommandNew = Command{
 			fmt.Printf("Tracker '%s' has been selected\n", t.Name)
 			fmt.Println()
 
-			// Input issue name
+			// Input subject
 			fmt.Print("Subject: ")
 			subject, err := reader.ReadString('\n')
 			if err != nil {
@@ -70,13 +71,35 @@ var CommandNew = Command{
 			subject = strings.TrimSpace(subject)
 			fmt.Println()
 
-			// Input issue description
+			// Input description
 			fmt.Print("Description: ")
 			description, err := reader.ReadString('\n')
 			if err != nil {
 				return err
 			}
 			description = strings.TrimSpace(description)
+			fmt.Println()
+
+			// Input start date
+			today := time.Now().Format("2006-01-02")
+			fmt.Printf("Start date (default %s): ", today)
+			startDate, err := reader.ReadString('\n')
+			if err != nil {
+				return err
+			}
+			startDate = strings.TrimSpace(startDate)
+			if startDate == "" {
+				startDate = today
+			}
+			fmt.Println()
+
+			// Input due date (optional)
+			fmt.Print("Due date (optional, YYYY-MM-DD): ")
+			dueDate, err := reader.ReadString('\n')
+			if err != nil {
+				return err
+			}
+			dueDate = strings.TrimSpace(dueDate)
 			fmt.Println()
 
 			// Fetch current user
@@ -90,6 +113,8 @@ var CommandNew = Command{
 				TrackerID:    t.ID,
 				Subject:      subject,
 				Description:  description,
+				StartDate:    startDate,
+				DueDate:      dueDate,
 				AssignedToID: user.ID,
 			}
 

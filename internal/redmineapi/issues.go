@@ -82,6 +82,8 @@ type CreateIssueRequest struct {
 	PriorityID     int           `json:"priority_id,omitempty"`
 	AssignedToID   int           `json:"assigned_to_id,omitempty"`
 	EstimatedHours *float64      `json:"estimated_hours,omitempty"`
+	StartDate      string        `json:"start_date,omitempty"`
+	DueDate        string        `json:"due_date,omitempty"`
 	CustomFields   []CustomField `json:"custom_fields,omitempty"`
 }
 

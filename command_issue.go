@@ -33,8 +33,9 @@ var CommandIssue = Command{
 				NewColumn("ID", 4, func(i int) string { return strconv.Itoa(issues[i].ID) }),
 				NewColumn("Project", 16, func(i int) string { return issues[i].Project.Name }),
 				NewColumn("Subject", 32, func(i int) string { return issues[i].Subject }),
-				NewColumn("Priority", 12, func(i int) string { return issues[i].Priority.Name }),
-				NewColumn("Assignee", 16, func(i int) string { return issues[i].AssignedTo.Name }),
+				NewColumn("Assignee", 12, func(i int) string { return issues[i].AssignedTo.Name }),
+				NewColumn("Start Date", 12, func(i int) string { return issues[i].StartDate }),
+				NewColumn("Due Date", 12, func(i int) string { return issues[i].DueDate }),
 				NewColumn("Status", 12, func(i int) string { return issues[i].Status.Name }),
 				NewColumn("Progress", 8, func(i int) string { return strconv.Itoa(issues[i].DoneRatio) + "%" }),
 			}
