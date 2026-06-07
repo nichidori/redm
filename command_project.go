@@ -24,7 +24,7 @@ var CommandProject = Command{
 			projects := resp.Projects
 			cols := []Column{
 				NewColumn("ID", 4, func(i int) string { return strconv.Itoa(projects[i].ID) }),
-				NewColumn("Name", 12, func(i int) string { return projects[i].Name }),
+				NewColumn("Name", 16, func(i int) string { return projects[i].Name }),
 				NewColumn("Description", 32, func(i int) string { return projects[i].Description }),
 				NewColumn("Last Update", 32, func(i int) string { return projects[i].UpdatedOn.String() }),
 			}

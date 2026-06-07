@@ -31,7 +31,7 @@ var CommandIssue = Command{
 			issues := resp.Issues
 			cols := []Column{
 				NewColumn("ID", 4, func(i int) string { return strconv.Itoa(issues[i].ID) }),
-				NewColumn("Project", 12, func(i int) string { return issues[i].Project.Name }),
+				NewColumn("Project", 16, func(i int) string { return issues[i].Project.Name }),
 				NewColumn("Subject", 32, func(i int) string { return issues[i].Subject }),
 				NewColumn("Priority", 12, func(i int) string { return issues[i].Priority.Name }),
 				NewColumn("Assignee", 16, func(i int) string { return issues[i].AssignedTo.Name }),
