@@ -8,7 +8,7 @@ import (
 
 var CommandUser = Command{
 	Name:        "user",
-	Description: "Show current logged in user",
+	Description: "Show current user",
 	Setup: func(fs *flag.FlagSet, s *state) func() error {
 		return func() error {
 			if s.config == nil {

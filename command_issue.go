@@ -11,7 +11,7 @@ import (
 
 var CommandIssue = Command{
 	Name:        "issue",
-	Description: "Lists all issues",
+	Description: "List issues",
 	Setup: func(fs *flag.FlagSet, s *state) func() error {
 		return func() error {
 			if s.config == nil {

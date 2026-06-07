@@ -21,15 +21,21 @@ type Command struct {
 }
 
 type CLI struct {
-	Name     string
-	State    *state
-	Commands map[string]Command
+	Name         string
+	State        *state
+	Commands     map[string]Command
+	CommandNames []string
 }
 
 func (c *CLI) Register(cmd Command) {
 	if c.Commands == nil {
 		c.Commands = make(map[string]Command)
 	}
+
+	if _, exists := c.Commands[cmd.Name]; !exists {
+		c.CommandNames = append(c.CommandNames, cmd.Name)
+	}
+
 	c.Commands[cmd.Name] = cmd
 }
 
@@ -63,8 +69,10 @@ func (c *CLI) Execute(args []string) error {
 
 func (c *CLI) PrintGlobalHelp() {
 	fmt.Printf("Usage: %s <command> [options]\n", c.Name)
-	fmt.Println("\nAvailable Commands:")
-	for _, cmd := range c.Commands {
-		fmt.Printf("  %-15s %s\n", cmd.Name, cmd.Description)
+	fmt.Println("\nAvailable commands:")
+
+	for _, name := range c.CommandNames {
+		cmd := c.Commands[name]
+		fmt.Printf("  %s %s\n", FixLength(cmd.Name, 12), cmd.Description)
 	}
 }

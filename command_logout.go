@@ -9,7 +9,7 @@ import (
 
 var CommandLogout = Command{
 	Name:        "logout",
-	Description: "Remove saved Redmine credentials",
+	Description: "Remove Redmine authentication",
 	Setup: func(fs *flag.FlagSet, s *state) func() error {
 		return func() error {
 			if s.config == nil {

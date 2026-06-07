@@ -14,7 +14,7 @@ import (
 
 var CommandLogin = Command{
 	Name:        "login",
-	Description: "Save Redmine credentials",
+	Description: "Set Redmine authentication",
 	Setup: func(fs *flag.FlagSet, s *state) func() error {
 		return func() error {
 			if s.config != nil {

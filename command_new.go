@@ -15,7 +15,7 @@ import (
 
 var CommandNew = Command{
 	Name:        "new",
-	Description: "Create new issue",
+	Description: "Create an issue",
 	Setup: func(fs *flag.FlagSet, s *state) func() error {
 		return func() error {
 			if s.config == nil {

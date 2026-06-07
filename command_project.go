@@ -9,7 +9,7 @@ import (
 
 var CommandProject = Command{
 	Name:        "project",
-	Description: "Lists all projects",
+	Description: "List projects",
 	Setup: func(fs *flag.FlagSet, s *state) func() error {
 		return func() error {
 			if s.config == nil {
