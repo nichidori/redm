@@ -13,12 +13,20 @@ var CommandIssue = Command{
 	Name:        "issue",
 	Description: "List issues",
 	Setup: func(fs *flag.FlagSet, s *state) func() error {
+		projectID := fs.Int("project", 0, "Filter issues by project ID")
+		assigneeID := fs.String("assignee", "", "Filter by assignee ID (or \"me\" for current user)")
+		statusID := fs.String("status", "", "Filter by status ID (or \"open\", \"closed\", \"*\")")
+
 		return func() error {
 			if s.config == nil {
 				return fmt.Errorf("not logged in")
 			}
 
-			resp, err := s.client.GetIssues(context.Background(), redmineapi.IssueFilter{})
+			resp, err := s.client.GetIssues(context.Background(), redmineapi.IssueFilter{
+				ProjectID:    *projectID,
+				AssignedToID: *assigneeID,
+				StatusID:     *statusID,
+			})
 			if err != nil {
 				return fmt.Errorf("failed to fetch issues: %w", err)
 			}
