@@ -35,6 +35,7 @@ func main() {
 	cli.Register(CommandIssue)
 	cli.Register(CommandNew)
 	cli.Register(CommandUpdate)
+	cli.Register(CommandVersion)
 
 	if err := cli.Execute(os.Args[1:]); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)

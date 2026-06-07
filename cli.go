@@ -12,6 +12,8 @@ import (
 	"github.com/nichidori/redm/internal/redmineapi"
 )
 
+const Version = "0.1.0"
+
 type state struct {
 	client *redmineapi.Client
 	config *config.Config
