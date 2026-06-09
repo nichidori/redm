@@ -13,8 +13,10 @@ import (
 )
 
 type updateFieldHandlers struct {
-	client *redmineapi.Client
-	issue  *redmineapi.Issue
+	client   *redmineapi.Client
+	issue    *redmineapi.Issue
+	project  *redmineapi.Project
+	projects []redmineapi.Project
 }
 
 var CommandUpdate = Command{
@@ -41,6 +43,22 @@ var CommandUpdate = Command{
 				return fmt.Errorf("failed to fetch issue: %w", err)
 			}
 
+			projectsResp, err := s.client.GetProjects(context.Background(), 0, 100)
+			if err != nil {
+				return fmt.Errorf("failed to fetch projects: %w", err)
+			}
+
+			var proj *redmineapi.Project
+			for i := range projectsResp.Projects {
+				if projectsResp.Projects[i].ID == issue.Project.ID {
+					proj = &projectsResp.Projects[i]
+					break
+				}
+			}
+			if proj == nil {
+				return fmt.Errorf("project not found in fetched list")
+			}
+
 			reader := bufio.NewReader(os.Stdin)
 
 			type field struct {
@@ -49,7 +67,7 @@ var CommandUpdate = Command{
 				update  func(*redmineapi.UpdateIssueRequest, *bufio.Reader) error
 			}
 
-			h := &updateFieldHandlers{client: s.client, issue: issue}
+			h := &updateFieldHandlers{client: s.client, issue: issue, project: proj, projects: projectsResp.Projects}
 
 			catName := ""
 			if issue.Category != nil {
@@ -58,7 +76,11 @@ var CommandUpdate = Command{
 
 			fields := []field{
 				{"Project", issue.Project.Name, h.updateProject},
-				{"Category", catName, h.updateCategory},
+			}
+			if len(proj.IssueCategories) > 0 {
+				fields = append(fields, field{"Category", catName, h.updateCategory})
+			}
+			fields = append(fields, []field{
 				{"Tracker", issue.Tracker.Name, h.updateTracker},
 				{"Subject", issue.Subject, h.updateSubject},
 				{"Description", issue.Description, h.updateDescription},
@@ -66,7 +88,7 @@ var CommandUpdate = Command{
 				{"Due Date", issue.DueDate, h.updateDueDate},
 				{"Status", issue.Status.Name, h.updateStatus},
 				{"Progress", strconv.Itoa(issue.DoneRatio) + "%", h.updateProgress},
-			}
+			}...)
 
 			for _, cf := range issue.CustomFields {
 				val := ""
@@ -114,11 +136,7 @@ var CommandUpdate = Command{
 }
 
 func (h *updateFieldHandlers) updateProject(r *redmineapi.UpdateIssueRequest, rd *bufio.Reader) error {
-	projects, err := h.client.GetProjects(context.Background(), 0, 100)
-	if err != nil {
-		return fmt.Errorf("failed to fetch projects: %w", err)
-	}
-	p, err := SelectOption(rd, "project", projects.Projects, func(p redmineapi.Project) string { return p.Name })
+	p, err := SelectOption(rd, "project", h.projects, func(p redmineapi.Project) string { return p.Name })
 	if err != nil {
 		return err
 	}
@@ -127,25 +145,11 @@ func (h *updateFieldHandlers) updateProject(r *redmineapi.UpdateIssueRequest, rd
 }
 
 func (h *updateFieldHandlers) updateCategory(r *redmineapi.UpdateIssueRequest, rd *bufio.Reader) error {
-	projects, err := h.client.GetProjects(context.Background(), 0, 100)
-	if err != nil {
-		return fmt.Errorf("failed to fetch projects: %w", err)
-	}
-	var proj *redmineapi.Project
-	for i := range projects.Projects {
-		if projects.Projects[i].ID == h.issue.Project.ID {
-			proj = &projects.Projects[i]
-			break
-		}
-	}
-	if proj == nil {
-		return fmt.Errorf("project not found in fetched list")
-	}
-	if len(proj.IssueCategories) == 0 {
+	if len(h.project.IssueCategories) == 0 {
 		fmt.Println("No categories available for this project")
 		return nil
 	}
-	cat, err := SelectOption(rd, "category", proj.IssueCategories, func(c redmineapi.IDName) string { return c.Name })
+	cat, err := SelectOption(rd, "category", h.project.IssueCategories, func(c redmineapi.IDName) string { return c.Name })
 	if err != nil {
 		return err
 	}
