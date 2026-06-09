@@ -118,6 +118,23 @@ var CommandNew = Command{
 			dueDate = strings.TrimSpace(dueDate)
 			fmt.Println()
 
+			// Input custom fields
+			var customFields []redmineapi.CustomField
+			if len(p.IssueCustomFields) > 0 {
+				for _, cf := range p.IssueCustomFields {
+					fmt.Printf("%s: ", cf.Name)
+					val, err := reader.ReadString('\n')
+					if err != nil {
+						return err
+					}
+					val = strings.TrimSpace(val)
+					if val != "" {
+						customFields = append(customFields, redmineapi.CustomField{ID: cf.ID, Value: val})
+					}
+					fmt.Println()
+				}
+			}
+
 			// Fetch current user
 			user, err := s.client.GetCurrentUser(context.Background())
 			if err != nil {
@@ -133,6 +150,7 @@ var CommandNew = Command{
 				StartDate:    startDate,
 				DueDate:      dueDate,
 				AssignedToID: user.ID,
+				CustomFields: customFields,
 			}
 
 			issue, err := s.client.CreateIssue(context.Background(), req)

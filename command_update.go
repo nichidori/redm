@@ -68,8 +68,30 @@ var CommandUpdate = Command{
 				{"Progress", strconv.Itoa(issue.DoneRatio) + "%", h.updateProgress},
 			}
 
+			for _, cf := range issue.CustomFields {
+				val := ""
+				if cf.Value != nil {
+					val = fmt.Sprintf("%v", cf.Value)
+				}
+				fields = append(fields, field{
+					cf.Name, val, func(r *redmineapi.UpdateIssueRequest, rd *bufio.Reader) error {
+						fmt.Print("New value: ")
+						v, err := rd.ReadString('\n')
+						if err != nil {
+							return err
+						}
+						v = strings.TrimSpace(v)
+						if v == "" {
+							return nil
+						}
+						r.CustomFields = []redmineapi.CustomField{{ID: cf.ID, Value: v}}
+						return nil
+					},
+				})
+			}
+
 			selected, err := SelectOption(reader, "field to update", fields, func(f field) string {
-				return FixLength(f.label, 12) + " : " + f.current
+				return FixLength(f.label, 16) + " : " + f.current
 			})
 			if err != nil {
 				return err
