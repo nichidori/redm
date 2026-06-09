@@ -2,14 +2,17 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"flag"
 	"fmt"
+	"net/url"
 	"os"
 	"strings"
 
 	"golang.org/x/term"
 
 	"github.com/nichidori/redm/internal/config"
+	"github.com/nichidori/redm/internal/redmineapi"
 )
 
 var CommandLogin = Command{
@@ -24,14 +27,22 @@ var CommandLogin = Command{
 			reader := bufio.NewReader(os.Stdin)
 
 			fmt.Print("Redmine URL: ")
-			url, err := reader.ReadString('\n')
+			rawURL, err := reader.ReadString('\n')
 			if err != nil {
 				return fmt.Errorf("read URL: %w", err)
 			}
-			url = strings.TrimSpace(url)
-			if url == "" {
+			rawURL = strings.TrimSpace(rawURL)
+			if rawURL == "" {
 				return fmt.Errorf("URL must not be empty")
 			}
+			parsedURL, err := url.ParseRequestURI(rawURL)
+			if err != nil {
+				return fmt.Errorf("invalid URL: %w", err)
+			}
+			if parsedURL.Scheme != "http" && parsedURL.Scheme != "https" {
+				return fmt.Errorf("URL must start with http:// or https://")
+			}
+			rawURL = strings.TrimRight(rawURL, "/")
 
 			fmt.Print("API Key: ")
 			rawKey, err := term.ReadPassword(int(os.Stdin.Fd()))
@@ -44,13 +55,23 @@ var CommandLogin = Command{
 				return fmt.Errorf("API key must not be empty")
 			}
 
-			cfg := &config.Config{URL: url, APIKey: apiKey}
+			testClient := redmineapi.NewClient(rawURL, apiKey)
+			user, err := testClient.GetCurrentUser(context.Background())
+			if err != nil {
+				errStr := err.Error()
+				if strings.Contains(errStr, "401") || strings.Contains(errStr, "403") {
+					return fmt.Errorf("login failed: invalid URL or API key")
+				}
+				return fmt.Errorf("failed to connect: %w", err)
+			}
+
+			cfg := &config.Config{URL: rawURL, APIKey: apiKey}
 			if err := config.Save(cfg); err != nil {
 				return fmt.Errorf("save config: %w", err)
 			}
 
 			s.config = cfg
-			fmt.Println("Login successful.")
+			fmt.Printf("Logged in as %s %s (%s)\n", user.FirstName, user.LastName, user.Login)
 			return nil
 		}
 	},
