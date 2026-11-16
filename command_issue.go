@@ -104,7 +104,7 @@ var CommandIssue = Command{
 				NewColumn("Start Date", 12, func(i int) string { return issues[i].StartDate }),
 				NewColumn("Due Date", 12, func(i int) string { return issues[i].DueDate }),
 				NewColumn("Status", 12, func(i int) string { return issues[i].Status.Name }),
-				NewColumn("Progress", 8, func(i int) string { return strconv.Itoa(issues[i].DoneRatio) + "%" }),
+				NewColumn("Progress", 15, func(i int) string { return FormatProgressBar(issues[i].DoneRatio) }),
 			}
 			PrintTable(cols, len(issues))
 
