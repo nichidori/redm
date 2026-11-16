@@ -95,7 +95,7 @@ type UpdateIssueRequest struct {
 	CategoryID     int           `json:"category_id,omitempty"`
 	StatusID       int           `json:"status_id,omitempty"`
 	Subject        string        `json:"subject,omitempty"`
-	Description    string        `json:"description,omitempty"`
+	Description    *string       `json:"description,omitempty"`
 	PriorityID     int           `json:"priority_id,omitempty"`
 	AssignedToID   int           `json:"assigned_to_id,omitempty"`
 	EstimatedHours *float64      `json:"estimated_hours,omitempty"`

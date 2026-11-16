@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -125,6 +126,11 @@ var CommandUpdate = Command{
 				return err
 			}
 
+			if reflect.DeepEqual(*req, redmineapi.UpdateIssueRequest{}) {
+				fmt.Println("No changes")
+				return nil
+			}
+
 			if err := s.client.UpdateIssue(context.Background(), issueID, req); err != nil {
 				return fmt.Errorf("failed to update issue: %w", err)
 			}
@@ -181,12 +187,17 @@ func (h *updateFieldHandlers) updateSubject(r *redmineapi.UpdateIssueRequest, rd
 }
 
 func (h *updateFieldHandlers) updateDescription(r *redmineapi.UpdateIssueRequest, rd *bufio.Reader) error {
-	fmt.Print("New Description: ")
-	v, err := rd.ReadString('\n')
+	fmt.Println("Opening editor for description...")
+	v, err := EditText(h.issue.Description)
 	if err != nil {
 		return err
 	}
-	r.Description = strings.TrimSpace(v)
+	current := strings.TrimRight(h.issue.Description, "\r\n")
+	if v == current {
+		fmt.Println("Description unchanged")
+		return nil
+	}
+	r.Description = &v
 	return nil
 }
 
