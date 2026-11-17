@@ -25,6 +25,20 @@ func PadRight(s string, length int, pad string) string {
 	return s
 }
 
+// AlignMultiline indents every line after the first so multiline values stay
+// aligned with the start of the first line.
+func AlignMultiline(value string, indent int) string {
+	value = strings.ReplaceAll(value, "\r\n", "\n")
+	value = strings.TrimRight(value, "\r\n")
+
+	lines := strings.Split(value, "\n")
+	pad := strings.Repeat(" ", indent)
+	for i := 1; i < len(lines); i++ {
+		lines[i] = pad + lines[i]
+	}
+	return strings.Join(lines, "\n")
+}
+
 const progressBarWidth = 10
 
 func FormatProgressBar(percent int) string {

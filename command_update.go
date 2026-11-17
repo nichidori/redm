@@ -114,7 +114,7 @@ var CommandUpdate = Command{
 			}
 
 			selected, err := SelectOption(reader, "field to update", fields, func(f field) string {
-				return FixLength(f.label, 16) + " : " + f.current
+				return FixLength(f.label, 16) + " : " + AlignMultiline(f.current, 16+3)
 			})
 			if err != nil {
 				return err

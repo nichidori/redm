@@ -85,7 +85,8 @@ func (c *CLI) PrintGlobalHelp() {
 func SelectOption[T any](reader *bufio.Reader, label string, options []T, optionFormatter func(T) string) (T, error) {
 	fmt.Printf("Select %s:\n", label)
 	for i, o := range options {
-		fmt.Printf("%v %s\n", FixLength(fmt.Sprintf("(%v)", i+1), 4), optionFormatter(o))
+		prefix := fmt.Sprintf("%v ", FixLength(fmt.Sprintf("(%v)", i+1), 4))
+		fmt.Println(prefix + AlignMultiline(optionFormatter(o), len(prefix)))
 	}
 
 	fmt.Printf("Enter %s number: ", label)
