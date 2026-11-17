@@ -10,6 +10,8 @@ import (
 	"github.com/nichidori/redm/internal/redmineapi"
 )
 
+const issuePageSize = 25
+
 var CommandIssue = Command{
 	Name:        "issue",
 	Description: "List issues",
@@ -18,15 +20,21 @@ var CommandIssue = Command{
 			project      string
 			status       string
 			allAssignees bool
+			page         int
 		)
 
 		fs.StringVar(&project, "p", "", "Filter by project ID or name")
 		fs.StringVar(&status, "s", "", "Filter by status ID or name")
 		fs.BoolVar(&allAssignees, "a", false, "Show issues for all assignees")
+		fs.IntVar(&page, "page", 1, "Page number (25 issues per page)")
 
 		return func() error {
 			if s.config == nil {
 				return fmt.Errorf("not logged in")
+			}
+
+			if page < 1 {
+				return fmt.Errorf("page must be 1 or greater")
 			}
 
 			var filterProjectID int
@@ -84,6 +92,8 @@ var CommandIssue = Command{
 				ProjectID:    filterProjectID,
 				AssignedToID: filterAssignedToID,
 				StatusID:     filterStatusID,
+				Offset:       (page - 1) * issuePageSize,
+				Limit:        issuePageSize,
 			})
 			if err != nil {
 				return fmt.Errorf("failed to fetch issues: %w", err)
@@ -100,7 +110,12 @@ var CommandIssue = Command{
 				NewColumn("Project", 16, func(i int) string { return issues[i].Project.Name }),
 				NewColumn("Subject", 40, func(i int) string { return issues[i].Subject }),
 				NewColumn("Tracker", 12, func(i int) string { return issues[i].Tracker.Name }),
-				NewColumn("Assignee", 12, func(i int) string { return issues[i].AssignedTo.Name }),
+				NewColumn("Assignee", 12, func(i int) string {
+					if issues[i].AssignedTo == nil {
+						return ""
+					}
+					return issues[i].AssignedTo.Name
+				}),
 				NewColumn("Start Date", 12, func(i int) string { return issues[i].StartDate }),
 				NewColumn("Due Date", 12, func(i int) string { return issues[i].DueDate }),
 				NewColumn("Status", 12, func(i int) string { return issues[i].Status.Name }),
